@@ -103,7 +103,7 @@ app.get("/chat/:roomId", async (req, res) => {
     orderBy: {
       id: "desc",
     },
-    take: 10,
+    take: 20,
   });
 
   res.json({

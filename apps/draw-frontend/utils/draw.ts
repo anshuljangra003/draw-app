@@ -9,7 +9,7 @@ type Shape = {
     height: number;
 };
 
-export async function initDraw(canvas: HTMLCanvasElement, roomId:string, socket:WebSocket) {
+export async function initDraw(canvas: HTMLCanvasElement, roomId:string, socket:WebSocket,ShapeType:string) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -29,54 +29,85 @@ export async function initDraw(canvas: HTMLCanvasElement, roomId:string, socket:
         }
 
     }
-
-
-
-    canvas.addEventListener("mousedown", (e) => {
-        const rect = canvas.getBoundingClientRect();
-        startX = e.clientX - rect.left;
-        startY = e.clientY - rect.top;
-        clicked = true;
-    });
-
-    canvas.addEventListener("mouseup", (e) => {
-      
+    clearCanvasandRender(ctx, canvas, ExistingShapes);
+    
+    if(ShapeType==="rect"){
+        canvas.addEventListener("mousedown", (e) => {
             const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-
-            const width = mouseX - startX;
-            const height = mouseY - startY;
-            const shape:Shape={
-                type: "rect",
-                x: startX,
-                y: startY,
-                width,
-                height,
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+            clicked = true;
+        });
+    
+        canvas.addEventListener("mouseup", (e) => {
+          
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+    
+                const width = mouseX - startX;
+                const height = mouseY - startY;
+                const shape:Shape={
+                    type: "rect",
+                    x: startX,
+                    y: startY,
+                    width,
+                    height,
+                }
+                ExistingShapes.push(shape);
+    
+                socket.send(JSON.stringify({
+                    "type":"chat",
+                    "roomId":parseInt(roomId),
+                    "message":JSON.stringify(shape)
+                }))
+    
+                clicked = false;
+            
+        });
+    
+        canvas.addEventListener("mousemove", (e) => {
+            if (clicked) {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+    
+                clearCanvasandRender(ctx, canvas, ExistingShapes);
+                ctx.strokeStyle = "rgba(255, 255, 255)";
+                ctx.strokeRect(startX, startY, mouseX - startX, mouseY - startY);
             }
-            ExistingShapes.push(shape);
+        });
+    }
+    else if(ShapeType==="line"){
+        console.log("first")
+        let clicked=false;
+        let startX=0;
+        let startY=0;
+        canvas.addEventListener("mousedown",(e)=>{
+            clicked=true;
+            startX=e.clientX;
+            startY=e.clientY;
+           
+        })
+        canvas.addEventListener("mouseup",()=>{
+            clicked=false;
+        })
+        canvas.addEventListener("mousemove",(e)=>{
+            if(clicked){ 
+                const clientX=e.clientX;
+                const clientY=e.clientY;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = "rgba(255, 255, 255)";
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(clientX,clientY);
+                ctx.stroke();
+            }
+        })
 
-            socket.send(JSON.stringify({
-                "type":"chat",
-                "roomId":parseInt(roomId),
-                "message":JSON.stringify(shape)
-            }))
+    }
 
-            clicked = false;
-        
-    });
-
-    canvas.addEventListener("mousemove", (e) => {
-        if (clicked) {
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-
-            clearCanvasandRender(ctx, canvas, ExistingShapes);
-            ctx.strokeStyle = "rgba(255, 255, 255)";
-            ctx.strokeRect(startX, startY, mouseX - startX, mouseY - startY);
-        }
-    });
+    
 }
 
 function clearCanvasandRender(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, ExistingShapes: Shape[]) {

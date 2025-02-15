@@ -8,11 +8,11 @@ function Canvas({roomId, socket}:{roomId:string, socket:WebSocket}) {
     useEffect(()=>{
         if(canvasRef.current){
             
-            initDraw(canvasRef.current,roomId,socket)
+            initDraw(canvasRef.current,roomId,socket,"rect")
 
          
         }
-    },[canvasRef])
+    },[canvasRef,roomId,socket])
 
     function clearCanvas(){
         const canvas=canvasRef.current;
@@ -23,8 +23,8 @@ function Canvas({roomId, socket}:{roomId:string, socket:WebSocket}) {
     }
 
   return (
-    <div>
-        <canvas ref={canvasRef} className='bg-blue-950' width={1000} height={1000}>page</canvas>
+    <div className='overflow-hidden'>
+        <canvas ref={canvasRef} className='bg-blue-950' width={window.innerWidth} height={window.innerHeight}>page</canvas>
     <button onClick={clearCanvas} className='bg-white px-3 py-2 text-black'>Clear Canvas</button>
     </div>
   )
