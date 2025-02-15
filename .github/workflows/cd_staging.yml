@@ -1,16 +1,15 @@
 name: Deploy to staging
 on:
   push:
-    branches:
-      - **
+    branches: [main]
 
 jobs:
   redeploy_everything:
     name: Deploying everything to staging
     runs-on: ubuntu-latest
     steps:
-       name: SSH into server
-       run: |
+     - name: SSH into server
+     - run: |
           echo ${{secret.SSH_PRIVATE_KEY}} &> ~/.ssh_key
           ssh -i ~/.ssh_key root@64.227.127.124
           cd draw-app/ && git pull
