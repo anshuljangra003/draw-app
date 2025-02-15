@@ -8,7 +8,7 @@ jobs:
     name: Deploying everything to staging
     runs-on: ubuntu-latest
     steps:
-     - name: SSH into server
+    
      - run: |
           echo ${{secret.SSH_PRIVATE_KEY}} &> ~/.ssh_key
           ssh -i ~/.ssh_key root@64.227.127.124
