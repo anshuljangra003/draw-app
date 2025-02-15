@@ -8,9 +8,8 @@ jobs:
     name: Deploying everything to staging
     runs-on: ubuntu-latest
     steps:
-    
      - run: |
-          echo ${{secret.SSH_PRIVATE_KEY}} &> ~/.ssh_key
+          echo "${{secrets.SSH_PRIVATE_KEY}}"" &> ~/.ssh_key
           ssh -i ~/.ssh_key root@64.227.127.124
           cd draw-app/ && git pull
           pnpm install
